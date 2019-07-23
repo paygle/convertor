@@ -65,7 +65,7 @@
                     <archive>
                         <manifest>
                             <addClasspath>true</addClasspath>
-                            <mainClass>com.dodar.Main</mainClass>
+                            <mainClass>com.dodar.MainApp</mainClass>
                         </manifest>
                     </archive>
                 </configuration>

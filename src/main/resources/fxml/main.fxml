@@ -1,8 +1,19 @@
-<?import javafx.geometry.Insets?>
-<?import javafx.scene.layout.GridPane?>
+<?xml version="1.0" encoding="UTF-8"?>
 
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.Label?>
-<GridPane fx:controller="com.dodar.MainController"
-          xmlns:fx="http://javafx.com/fxml" alignment="center" hgap="10" vgap="10">
-</GridPane>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+
+<VBox id="root" fx:id="rootLayout" prefHeight="560" prefWidth="1000" styleClass="body" xmlns="http://javafx.com/javafx/8.0.172-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.dodar.AppControl">
+   <children>
+      <HBox alignment="CENTER" prefHeight="40.0" prefWidth="1000.0">
+         <children>
+            <Label text="数据文件路径：" />
+            <TextField fx:id="textpath" promptText="选择文件路径" />
+            <Button mnemonicParsing="false" onAction="#directorySelect" text="文件目录选择" />
+         </children></HBox>
+      <HBox prefHeight="74.0" prefWidth="1000.0" />
+   </children>
+</VBox>
