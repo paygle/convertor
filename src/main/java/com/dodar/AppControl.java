@@ -1,6 +1,5 @@
 package com.dodar;
 
-import com.sun.istack.internal.Nullable;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
@@ -65,10 +64,10 @@ public class AppControl implements Initializable {
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-
-        propertyUrl = getClass().getResource("/convertor.properties").toExternalForm().replace("file:/", "");
-        // 初始化读取配置
-        readConfig();
+        File file = new File("./convertor.properties");
+        properties = new Properties();
+        propertyUrl = file.getAbsolutePath();
+        readConfig();  // 初始化读取配置
     }
 
     /**
@@ -100,7 +99,6 @@ public class AppControl implements Initializable {
         try {
             File file = new File(propertyUrl);
             FileInputStream inputStream = new FileInputStream(file);
-            properties = new Properties();
             properties.load(inputStream);
             filepath.setText(properties.getProperty("filepath"));
             sqlitepath.setText(properties.getProperty("sqlitepath"));
