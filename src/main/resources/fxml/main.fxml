@@ -44,12 +44,13 @@
             </HBox>
             <HBox styleClass="h-box-row" GridPane.columnIndex="0" GridPane.rowIndex="1">
                <Label styleClass="c-label" text="数据库登录名：" />
-               <TextField fx:id="sqlitename" promptText="用户名" styleClass="c-field" />
+               <TextField fx:id="sqlitename" promptText="登录用户名" styleClass="c-field" />
             </HBox>
             <HBox styleClass="h-box-row" GridPane.columnIndex="1" GridPane.rowIndex="1">
                <Label styleClass="c-label" text="数据库密码：" />
                <TextField fx:id="sqlitepass" promptText="登录密码" styleClass="c-field" />
-               <Button mnemonicParsing="false" onAction="#updateConfig" styleClass="c-btn" text="更新配置文件" />
+               <Button mnemonicParsing="false" onAction="#updateConfig" styleClass="c-btn" text="读取配置" />
+               <Button mnemonicParsing="false" onAction="#saveConfig" styleClass="c-btn" text="保存配置" />
             </HBox>
             <HBox styleClass="h-box-row" GridPane.columnIndex="0" GridPane.rowIndex="2">
                <Label styleClass="c-label" text="行-数据分隔符：" />

@@ -1,5 +1,6 @@
 package com.dodar;
 
+import com.sun.istack.internal.Nullable;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
@@ -8,11 +9,18 @@ import javafx.scene.control.TextField;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.Stage;
 
-import java.io.File;
+import java.io.*;
 import java.net.URL;
+import java.util.Properties;
 import java.util.ResourceBundle;
 
 public class AppControl implements Initializable {
+
+    /**
+     * 属性配置对象
+     */
+    private Properties properties;
+    private String propertyUrl;
 
     /**
      * 选择数据文件路径
@@ -58,6 +66,9 @@ public class AppControl implements Initializable {
     @Override
     public void initialize(URL location, ResourceBundle resources) {
 
+        propertyUrl = getClass().getResource("/convertor.properties").toExternalForm().replace("file:/", "");
+        // 初始化读取配置
+        readConfig();
     }
 
     /**
@@ -83,12 +94,56 @@ public class AppControl implements Initializable {
     }
 
     /**
-     * 默认参数配置更新
+     * 读取配置文件
+     */
+    public void readConfig() {
+        try {
+            File file = new File(propertyUrl);
+            FileInputStream inputStream = new FileInputStream(file);
+            properties = new Properties();
+            properties.load(inputStream);
+            filepath.setText(properties.getProperty("filepath"));
+            sqlitepath.setText(properties.getProperty("sqlitepath"));
+            sqlitename.setText(properties.getProperty("sqlitename"));
+            sqlitepass.setText(properties.getProperty("sqlitepass"));
+            rowflag.setText(properties.getProperty("rowflag"));
+            colflag.setText(properties.getProperty("colflag"));
+            fieldnames.setText(properties.getProperty("fieldnames"));
+        } catch (IOException e) {
+            System.out.println("读取属性文件错误");
+        }
+    }
+
+    /**
+     * 默认参数配置读取
      * @param e
      */
     @FXML
     public void updateConfig(ActionEvent e) {
+        readConfig();
+    }
 
+    /**
+     * 默认参数配置保存
+     * @param e
+     */
+    @FXML
+    public void saveConfig(ActionEvent e) {
+        properties.setProperty("filepath", filepath.getText());
+        properties.setProperty("sqlitepath", sqlitepath.getText());
+        properties.setProperty("sqlitename", sqlitename.getText());
+        properties.setProperty("sqlitepass", sqlitepass.getText());
+        properties.setProperty("rowflag", rowflag.getText());
+        properties.setProperty("colflag", colflag.getText());
+        properties.setProperty("fieldnames", fieldnames.getText());
+        try {
+            File file = new File(propertyUrl);
+            FileOutputStream fos = new FileOutputStream(file);
+            OutputStreamWriter ow = new OutputStreamWriter(fos);
+            properties.store(ow, "配置文件");
+        } catch (IOException ex) {
+            System.out.println("读取属性文件错误");
+        }
     }
 
     /**
