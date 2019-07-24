@@ -7,6 +7,8 @@ import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.Stage;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.io.*;
 import java.net.URL;
@@ -14,6 +16,8 @@ import java.util.Properties;
 import java.util.ResourceBundle;
 
 public class AppControl implements Initializable {
+
+    static Logger logger = LogManager.getLogger("Console");
 
     /**
      * 属性配置对象
@@ -97,6 +101,7 @@ public class AppControl implements Initializable {
      */
     public void readConfig() {
         try {
+            logger.info("准备读取配置");
             File file = new File(propertyUrl);
             FileInputStream inputStream = new FileInputStream(file);
             properties.load(inputStream);
@@ -108,7 +113,7 @@ public class AppControl implements Initializable {
             colflag.setText(properties.getProperty("colflag"));
             fieldnames.setText(properties.getProperty("fieldnames"));
         } catch (IOException e) {
-            System.out.println("读取属性文件错误");
+            logger.error("读取属性文件错误");
         }
     }
 
@@ -135,12 +140,13 @@ public class AppControl implements Initializable {
         properties.setProperty("colflag", colflag.getText());
         properties.setProperty("fieldnames", fieldnames.getText());
         try {
+            logger.info("准备保存配置");
             File file = new File(propertyUrl);
             FileOutputStream fos = new FileOutputStream(file);
             OutputStreamWriter ow = new OutputStreamWriter(fos);
             properties.store(ow, "配置文件");
         } catch (IOException ex) {
-            System.out.println("读取属性文件错误");
+            logger.error("读取属性文件错误");
         }
     }
 
