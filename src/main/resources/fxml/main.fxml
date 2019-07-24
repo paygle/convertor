@@ -2,18 +2,75 @@
 
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
 <?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.ColumnConstraints?>
+<?import javafx.scene.layout.GridPane?>
 <?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.RowConstraints?>
 <?import javafx.scene.layout.VBox?>
 
-<VBox id="root" fx:id="rootLayout" prefHeight="560" prefWidth="1000" styleClass="body" xmlns="http://javafx.com/javafx/8.0.172-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.dodar.AppControl">
+<VBox fx:id="rootLayout" prefHeight="560" prefWidth="1080" styleClass="body" xmlns="http://javafx.com/javafx/8.0.172-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.dodar.AppControl">
    <children>
-      <HBox alignment="CENTER" prefHeight="40.0" prefWidth="1000.0">
+      <GridPane prefWidth="1000">
+         <columnConstraints>
+            <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+            <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+            <ColumnConstraints />
+            <ColumnConstraints />
+         </columnConstraints>
+         <rowConstraints>
+            <RowConstraints />
+            <RowConstraints />
+            <RowConstraints />
+         </rowConstraints>
+
          <children>
-            <Label text="数据文件路径：" />
-            <TextField fx:id="textpath" promptText="选择文件路径" />
-            <Button mnemonicParsing="false" onAction="#directorySelect" text="文件目录选择" />
-         </children></HBox>
-      <HBox prefHeight="74.0" prefWidth="1000.0" />
+            <HBox styleClass="h-box-row" GridPane.columnIndex="0" GridPane.rowIndex="0">
+               <children>
+                  <Label styleClass="c-label" text=" 数据文件路径：" />
+                  <TextField fx:id="filepath" promptText="选择数据文件路径" styleClass="c-field" />
+                  <Button mnemonicParsing="false" onAction="#directorySelect" styleClass="c-btn" text="文件目录选择" />
+               </children>
+            </HBox>
+            <HBox styleClass="h-box-row" GridPane.columnIndex="1" GridPane.rowIndex="0">
+               <children>
+                  <Label styleClass="c-label" text="SQLite路径：" />
+                  <TextField fx:id="sqlitepath" promptText="选择SQLite文件路径" styleClass="c-field" />
+                  <Button mnemonicParsing="false" onAction="#sqliteSelect" styleClass="c-btn" text="SQLite文件选择" />
+               </children>
+            </HBox>
+            <HBox styleClass="h-box-row" GridPane.columnIndex="0" GridPane.rowIndex="1">
+               <Label styleClass="c-label" text="数据库登录名：" />
+               <TextField fx:id="sqlitename" promptText="用户名" styleClass="c-field" />
+            </HBox>
+            <HBox styleClass="h-box-row" GridPane.columnIndex="1" GridPane.rowIndex="1">
+               <Label styleClass="c-label" text="数据库密码：" />
+               <TextField fx:id="sqlitepass" promptText="登录密码" styleClass="c-field" />
+               <Button mnemonicParsing="false" onAction="#updateConfig" styleClass="c-btn" text="更新配置文件" />
+            </HBox>
+            <HBox styleClass="h-box-row" GridPane.columnIndex="0" GridPane.rowIndex="2">
+               <Label styleClass="c-label" text="行-数据分隔符：" />
+               <TextField fx:id="rowflag" promptText="用于分隔成数据库行数据，如: ;" styleClass="c-field" />
+            </HBox>
+            <HBox styleClass="h-box-row" GridPane.columnIndex="1" GridPane.rowIndex="2">
+               <Label styleClass="c-label" text="列-数据分隔符：" />
+               <TextField fx:id="colflag" promptText="用于做分隔成字段， 如： =" styleClass="c-field" />
+               <Button mnemonicParsing="false" onAction="#readFilesToData" styleClass="c-btn" text="读取数据文件" />
+            </HBox>
+         </children>
+      </GridPane>
+      <HBox styleClass="h-box-row" GridPane.columnIndex="1" GridPane.rowIndex="1">
+         <Label styleClass="c-label" text="数据字段名：" />
+         <TextField fx:id="fieldnames" promptText="列分隔数据库字段英文名称， 如： a,b,c,d,e" styleClass="fieldname" />
+         <Button mnemonicParsing="false" onAction="#saveDataSqlite" styleClass="c-btn" text="保存到数据库" />
+      </HBox>
+      <ScrollPane prefHeight="450.0">
+        <content>
+         <TableView fx:id="datatable" prefHeight="388" prefWidth="1048"></TableView>
+        </content>
+      </ScrollPane>
    </children>
 </VBox>

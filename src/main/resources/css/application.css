@@ -1,3 +1,25 @@
 .body {
-    -fx-background-color: aquamarine;
+    -fx-background-color: #ccc;
+    -fx-padding: 20px;
+}
+
+.h-box-row {
+    -fx-alignment: top-left;
+    -fx-padding: 5px 10px;
+}
+
+.c-label{
+    -fx-pref-width: 135px;
+    -fx-padding: 5px 10px 5px 30px;
+}
+
+.c-field {
+    -fx-pref-width: 238px;
+    -fx-padding: 4px;
+    -fx-background-insets: 0 10px 0 0;
+}
+.fieldname {
+    -fx-pref-width: 765px;
+    -fx-padding: 4px;
+    -fx-background-insets: 0 10px 0 0;
 }
