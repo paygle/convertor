@@ -85,12 +85,20 @@
     </build>
 
     <dependencies>
+        <!-- 动态创建Bean 数据对象 -->
+        <!--<dependency>-->
+            <!--<groupId>com.google.code.gson</groupId>-->
+            <!--<artifactId>gson</artifactId>-->
+            <!--<version>2.8.5</version>-->
+        <!--</dependency>-->
+        <!-- 测试工具 -->
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
             <version>4.12</version>
             <scope>test</scope>
         </dependency>
+        <!-- 运行/调试日志跟踪打印 -->
         <dependency>
             <groupId>org.apache.logging.log4j</groupId>
             <artifactId>log4j-core</artifactId>

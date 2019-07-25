@@ -1,5 +1,6 @@
 package com.dodar;
 
+import com.dodar.utils.Eval;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
@@ -17,6 +18,8 @@ public class MainApp extends Application {
         primaryStage.setTitle("Hello World");
         primaryStage.setScene(scene);
         primaryStage.show();
+        // 测试编译
+        Eval.main(new String[]{"s"});
     }
 
 

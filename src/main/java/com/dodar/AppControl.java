@@ -6,24 +6,41 @@ import javafx.fxml.Initializable;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
 import javafx.stage.DirectoryChooser;
+import javafx.stage.FileChooser;
 import javafx.stage.Stage;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 
 import java.io.*;
 import java.net.URL;
-import java.util.Properties;
-import java.util.ResourceBundle;
+import java.util.*;
+
+import static com.dodar.utils.Log.logger;
 
 public class AppControl implements Initializable {
-
-    static Logger logger = LogManager.getLogger("Console");
 
     /**
      * 属性配置对象
      */
     private Properties properties;
     private String propertyUrl;
+    /**
+     * 文件扩展名
+     */
+    private String filext = ".txt";
+
+    /**
+     * 数据库字段名集合
+     */
+    private String[] fields;
+
+    /**
+     * 读取文件转换后的数据
+     */
+    private ArrayList<String[]> filedata = new ArrayList<>();
+
+    /**
+     * 根据字段动态自动的数据对象集合
+     */
+    private ArrayList<Object> beansdata = new ArrayList<>();
 
     /**
      * 选择数据文件路径
@@ -80,7 +97,6 @@ public class AppControl implements Initializable {
      */
     @FXML
     protected void directorySelect(ActionEvent e) {
-        System.out.println("you click me" + e);
         DirectoryChooser chooser = new DirectoryChooser();
         File file = chooser.showDialog(new Stage());
         String path = file.getPath();
@@ -93,7 +109,19 @@ public class AppControl implements Initializable {
      */
     @FXML
     public void sqliteSelect(ActionEvent e) {
+        FileChooser fileChooser = new FileChooser();
+        File file = fileChooser.showOpenDialog(new Stage());
+        String path = file.getPath();
+        sqlitepath.setText(path);
+    }
 
+    /**
+     * 获取数据库字段集合
+     * @param keys
+     * @return
+     */
+    public String[] getFieldKeys(String keys) {
+        return keys.split(",");
     }
 
     /**
@@ -105,25 +133,18 @@ public class AppControl implements Initializable {
             File file = new File(propertyUrl);
             FileInputStream inputStream = new FileInputStream(file);
             properties.load(inputStream);
+            String fnames = properties.getProperty("fieldnames");
             filepath.setText(properties.getProperty("filepath"));
             sqlitepath.setText(properties.getProperty("sqlitepath"));
             sqlitename.setText(properties.getProperty("sqlitename"));
             sqlitepass.setText(properties.getProperty("sqlitepass"));
             rowflag.setText(properties.getProperty("rowflag"));
             colflag.setText(properties.getProperty("colflag"));
-            fieldnames.setText(properties.getProperty("fieldnames"));
+            fieldnames.setText(fnames);
+            if (fnames instanceof String) fields = getFieldKeys(fnames);
         } catch (IOException e) {
             logger.error("读取属性文件错误");
         }
-    }
-
-    /**
-     * 默认参数配置读取
-     * @param e
-     */
-    @FXML
-    public void updateConfig(ActionEvent e) {
-        readConfig();
     }
 
     /**
@@ -151,11 +172,103 @@ public class AppControl implements Initializable {
     }
 
     /**
+     * 读取单个数据文件转成字符串
+     * @return
+     */
+    public String readFile(File file) {
+        String encoding = "UTF-8";
+        FileInputStream inputStream;
+        Long filelength = file.length();
+        byte[] filecontent = new byte[filelength.intValue()];
+        try {
+            inputStream = new FileInputStream(file);
+            inputStream.read(filecontent);
+            return new String(filecontent, encoding);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    /**
+     * 将从文件中读取出来的字符串数据转换成列表对象数据
+     * @param data
+     * @return
+     */
+    public ArrayList<String[]> fileStrToData(String data) {
+        String strdata = data.replaceAll("[\\t\\n\\r]", "");
+        String rowsplit = rowflag.getText();
+        String colsplit = colflag.getText();
+        String[] rowsdata = strdata.split(rowsplit);
+        ArrayList<String[]> tmplist = new ArrayList<>();
+
+        for (int i = 0; i < rowsdata.length; i++) {
+            String[] colsdata = rowsdata[i].split(colsplit);
+            if (colsdata.length > 0) {
+                tmplist.add(colsdata);
+            }
+        }
+        return tmplist;
+    }
+
+    /**
      * 读取TEXT数据文件并转换成数据库对象
      * @param e
      */
     @FXML
     public void readFilesToData(ActionEvent e) {
+        String path;
+        ArrayList<String[]> tmpdata;
+        String dirpath = filepath.getText();
+        File file = new File(dirpath);
+        File[] flist = file.listFiles();
+
+        // 读取所有数据文件且合并数据
+        for (int i = 0; i < flist.length; i++) {
+            if (flist[i].isFile()) {
+                path = flist[i].getPath();
+                if (path.lastIndexOf(filext) >= 0) {
+                    tmpdata = fileStrToData(readFile(flist[i]));
+                    if (tmpdata instanceof ArrayList) {
+                        filedata.addAll(tmpdata);
+                    }
+                }
+            }
+        }
+
+        // 动态生成数据对象
+        if (filedata.size() > 0 && fields instanceof String[] && fields.length > 0) {
+            Map<String, Object> map = new HashMap<>();
+            for (String[] tmpstr : filedata) {
+
+                try {
+                    for (int j = 0; j < fields.length; j++) {
+                        if (fields[j] instanceof String) {
+                            if (tmpstr[j] instanceof String) {
+                                map.put(fields[j], tmpstr[j]);
+                            } else {
+                                map.put(fields[j], "");
+                            }
+                        }
+                    }
+
+                } catch (Exception ex) {
+                    logger.error("动态生成数据类错误" + ex);
+                }
+            }
+        }
+
+        if (beansdata.size() > 0) {
+            setTableViewData(beansdata);
+        }
+    }
+
+    /**
+     * 设置 TableView 显示数据
+     * @param dataObject
+     */
+    public void setTableViewData(ArrayList<Object> dataObject) {
+
 
     }
 
