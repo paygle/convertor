@@ -19,7 +19,7 @@ public class MainApp extends Application {
         primaryStage.setScene(scene);
         primaryStage.show();
         // 测试编译
-        Eval.main(new String[]{"s"});
+//        Eval.main(new String[]{"s"});
     }
 
 

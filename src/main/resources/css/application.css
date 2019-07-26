@@ -23,3 +23,6 @@
     -fx-padding: 4px;
     -fx-background-insets: 0 10px 0 0;
 }
+.status-info {
+    -fx-padding: 5px;
+}

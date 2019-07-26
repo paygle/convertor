@@ -1,8 +1,10 @@
 package com.dodar;
 
+import com.dodar.utils.SQLite;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
+import javafx.scene.control.Label;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
 import javafx.stage.DirectoryChooser;
@@ -11,6 +13,7 @@ import javafx.stage.Stage;
 
 import java.io.*;
 import java.net.URL;
+import java.sql.Statement;
 import java.util.*;
 
 import static com.dodar.utils.Log.logger;
@@ -22,6 +25,7 @@ public class AppControl implements Initializable {
      */
     private Properties properties;
     private String propertyUrl;
+    private Statement statement;
     /**
      * 文件扩展名
      */
@@ -82,6 +86,11 @@ public class AppControl implements Initializable {
      */
     @FXML
     private TableView datatable;
+    /**
+     * 状态信息栏
+     */
+    @FXML
+    private Label loginfo;
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
@@ -116,34 +125,38 @@ public class AppControl implements Initializable {
     }
 
     /**
-     * 获取数据库字段集合
-     * @param keys
-     * @return
+     * 初始化数据库字段集合
      */
-    public String[] getFieldKeys(String keys) {
-        return keys.split(",");
+    public void initFieldKeys() {
+        String fnames = properties.getProperty("fieldnames");
+        if (!fnames.isEmpty()) {
+            fields = fnames.split(",");
+        }
     }
 
     /**
      * 读取配置文件
      */
     public void readConfig() {
-        try {
-            logger.info("准备读取配置");
-            File file = new File(propertyUrl);
-            FileInputStream inputStream = new FileInputStream(file);
-            properties.load(inputStream);
-            String fnames = properties.getProperty("fieldnames");
-            filepath.setText(properties.getProperty("filepath"));
-            sqlitepath.setText(properties.getProperty("sqlitepath"));
-            sqlitename.setText(properties.getProperty("sqlitename"));
-            sqlitepass.setText(properties.getProperty("sqlitepass"));
-            rowflag.setText(properties.getProperty("rowflag"));
-            colflag.setText(properties.getProperty("colflag"));
-            fieldnames.setText(fnames);
-            if (fnames instanceof String) fields = getFieldKeys(fnames);
-        } catch (IOException e) {
-            logger.error("读取属性文件错误");
+        File file = new File(propertyUrl);
+        if (file.exists()) {
+            try {
+                logger.info("准备读取配置");
+                loginfo.setText("读取配置");
+                FileInputStream inputStream = new FileInputStream(file);
+                properties.load(inputStream);
+                filepath.setText(properties.getProperty("filepath"));
+                sqlitepath.setText(properties.getProperty("sqlitepath"));
+                sqlitename.setText(properties.getProperty("sqlitename"));
+                sqlitepass.setText(properties.getProperty("sqlitepass"));
+                rowflag.setText(properties.getProperty("rowflag"));
+                colflag.setText(properties.getProperty("colflag"));
+                fieldnames.setText(properties.getProperty("fieldnames"));
+                initFieldKeys();
+            } catch (IOException e) {
+                loginfo.setText("读取配置错误");
+                logger.error("读取属性文件错误");
+            }
         }
     }
 
@@ -160,13 +173,16 @@ public class AppControl implements Initializable {
         properties.setProperty("rowflag", rowflag.getText());
         properties.setProperty("colflag", colflag.getText());
         properties.setProperty("fieldnames", fieldnames.getText());
+        initFieldKeys();
         try {
+            loginfo.setText("保存配置");
             logger.info("准备保存配置");
             File file = new File(propertyUrl);
             FileOutputStream fos = new FileOutputStream(file);
             OutputStreamWriter ow = new OutputStreamWriter(fos);
             properties.store(ow, "配置文件");
         } catch (IOException ex) {
+            loginfo.setText("读取属性文件错误");
             logger.error("读取属性文件错误");
         }
     }
@@ -201,14 +217,18 @@ public class AppControl implements Initializable {
         String colsplit = colflag.getText();
         String[] rowsdata = strdata.split(rowsplit);
         ArrayList<String[]> tmplist = new ArrayList<>();
-
-        for (int i = 0; i < rowsdata.length; i++) {
-            String[] colsdata = rowsdata[i].split(colsplit);
-            if (colsdata.length > 0) {
-                tmplist.add(colsdata);
+        if (rowsplit.isEmpty() || colsplit.isEmpty()) {
+            loginfo.setText("行列分隔符缺失");
+            return null;
+        } else {
+            for (int i = 0; i < rowsdata.length; i++) {
+                String[] colsdata = rowsdata[i].split(colsplit);
+                if (colsdata.length > 0) {
+                    tmplist.add(colsdata);
+                }
             }
+            return tmplist;
         }
-        return tmplist;
     }
 
     /**
@@ -222,44 +242,67 @@ public class AppControl implements Initializable {
         String dirpath = filepath.getText();
         File file = new File(dirpath);
         File[] flist = file.listFiles();
+        Map<String, Object> map = new HashMap<>();
 
-        // 读取所有数据文件且合并数据
-        for (int i = 0; i < flist.length; i++) {
-            if (flist[i].isFile()) {
-                path = flist[i].getPath();
-                if (path.lastIndexOf(filext) >= 0) {
-                    tmpdata = fileStrToData(readFile(flist[i]));
-                    if (tmpdata instanceof ArrayList) {
-                        filedata.addAll(tmpdata);
-                    }
-                }
-            }
-        }
-
-        // 动态生成数据对象
-        if (filedata.size() > 0 && fields instanceof String[] && fields.length > 0) {
-            Map<String, Object> map = new HashMap<>();
-            for (String[] tmpstr : filedata) {
-
-                try {
-                    for (int j = 0; j < fields.length; j++) {
-                        if (fields[j] instanceof String) {
-                            if (tmpstr[j] instanceof String) {
-                                map.put(fields[j], tmpstr[j]);
-                            } else {
-                                map.put(fields[j], "");
-                            }
+        if (flist != null) {
+            loginfo.setText("读取数据文件...");
+            logger.info("开始读取数据文件");
+            // 读取所有数据文件且合并数据
+            for (int i = 0; i < flist.length; i++) {
+                if (flist[i].isFile()) {
+                    path = flist[i].getPath();
+                    if (path.lastIndexOf(filext) >= 0) {
+                        tmpdata = fileStrToData(readFile(flist[i]));
+                        if (tmpdata instanceof ArrayList) {
+                            filedata.addAll(tmpdata);
                         }
                     }
-
-                } catch (Exception ex) {
-                    logger.error("动态生成数据类错误" + ex);
                 }
             }
+
+            // 动态生成数据对象
+            if (filedata.size() > 0 && fields instanceof String[]) {
+                for (String[] tmpstr : filedata) {
+                    try {
+                        for (int j = 0; j < fields.length; j++) {
+                            if (fields[j] instanceof String) {
+                                if (tmpstr[j] instanceof String) {
+                                    loginfo.setText(fields[j] + "=" + tmpstr[j]);
+                                    map.put(fields[j], tmpstr[j]);
+                                } else {
+                                    map.put(fields[j], "");
+                                }
+                            }
+                        }
+
+                    } catch (Exception ex) {
+                        loginfo.setText("动态生成数据类错误");
+                        logger.error("动态生成数据类错误" + ex);
+                    }
+                }
+            } else {
+                loginfo.setText("数据字段未设置");
+            }
+
+            if (beansdata.size() > 0) {
+                setTableViewData(beansdata);
+            }
+        } else {
+            loginfo.setText("没有选择读取数据的目录");
+            logger.error("没有选择读取数据的目录");
         }
 
-        if (beansdata.size() > 0) {
-            setTableViewData(beansdata);
+    }
+
+    /**
+     * 初始化SQLite 语句对象
+     */
+    public void initStatement() {
+        String sqlpath = sqlitepath.getText();
+        if (statement == null && !sqlpath.isEmpty()) {
+            String sqlname = sqlitename.getText();
+            String sqlpass = sqlitepass.getText();
+            statement = SQLite.getStatement(sqlpath, sqlname, sqlpass);
         }
     }
 
@@ -268,6 +311,7 @@ public class AppControl implements Initializable {
      * @param dataObject
      */
     public void setTableViewData(ArrayList<Object> dataObject) {
+        initStatement();
 
 
     }

@@ -3,6 +3,7 @@
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.control.Separator?>
 <?import javafx.scene.control.TableView?>
 <?import javafx.scene.control.TextField?>
 <?import javafx.scene.layout.ColumnConstraints?>
@@ -71,5 +72,7 @@
          <TableView fx:id="datatable" editable="true" prefHeight="388" prefWidth="1048" />
         </content>
       </ScrollPane>
+      <Separator prefWidth="1000.0" />
+      <Label styleClass="status-info" fx:id="loginfo" prefHeight="15.0" prefWidth="1080" text="状态信息" />
    </children>
 </VBox>
