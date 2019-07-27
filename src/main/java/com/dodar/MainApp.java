@@ -37,7 +37,7 @@ public class MainApp extends Application {
             }
         });
         // 测试编译
-//        Eval.main(new String[]{"s"});
+        Eval.main(new String[]{"s"});
     }
 
 

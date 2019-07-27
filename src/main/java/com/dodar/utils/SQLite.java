@@ -279,8 +279,8 @@ public class SQLite {
      */
     public static void closeAll() {
         try {
-            statement.close();
-            connection.close();
+            if (statement != null) statement.close();
+            if (connection != null) connection.close();
             logger.info("数据库释放成功");
         } catch (SQLException ex) {
             logger.info("数据库释放失败");
