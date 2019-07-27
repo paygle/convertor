@@ -11,6 +11,7 @@ import javafx.stage.DirectoryChooser;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 
+import java.awt.event.MouseEvent;
 import java.io.*;
 import java.net.URL;
 import java.sql.Statement;
@@ -26,6 +27,11 @@ public class AppControl implements Initializable {
     private Properties properties;
     private String propertyUrl;
     private Statement statement;
+    /**
+     * 作为组件之间通信的承载对象
+     */
+    private Stage stage;
+
     /**
      * 文件扩展名
      */
@@ -91,6 +97,10 @@ public class AppControl implements Initializable {
      */
     @FXML
     private Label loginfo;
+
+    public void setStage(Stage stage) {
+        this.stage = stage;
+    }
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
@@ -291,7 +301,6 @@ public class AppControl implements Initializable {
             loginfo.setText("没有选择读取数据的目录");
             logger.error("没有选择读取数据的目录");
         }
-
     }
 
     /**
@@ -302,7 +311,8 @@ public class AppControl implements Initializable {
         if (statement == null && !sqlpath.isEmpty()) {
             String sqlname = sqlitename.getText();
             String sqlpass = sqlitepass.getText();
-            statement = SQLite.getStatement(sqlpath, sqlname, sqlpass);
+            SQLite.init(sqlpath, sqlname, sqlpass);
+            statement = SQLite.statement;
         }
     }
 
@@ -312,17 +322,22 @@ public class AppControl implements Initializable {
      */
     public void setTableViewData(ArrayList<Object> dataObject) {
         initStatement();
+        if (statement != null) {
 
-
+        }
     }
 
     /**
      * 保存数据到Sqlite数据库
-     * @param e
      */
-    @FXML
-    public void saveDataSqlite(ActionEvent e) {
-
+    public void saveDataSqlite() {
+        initStatement();
+        if (statement != null) {
+            SQLite.replace("example", "name, content", "cc,cccccc", "name");
+        }
     }
 
+    public void closeConnection() {
+        SQLite.closeAll();
+    }
 }

@@ -63,9 +63,11 @@
          </children>
       </GridPane>
       <HBox styleClass="h-box-row" GridPane.columnIndex="1" GridPane.rowIndex="1">
-         <Label styleClass="c-label" text="数据字段名：" />
+         <Label styleClass="c-label" text="数据库表名" />
+         <TextField fx:id="tablename" promptText="数据库表英文名称" />
+         <Label styleClass="t-label" text="表字段：" />
          <TextField fx:id="fieldnames" promptText="列分隔数据库字段英文名称， 如： a,b,c,d,e" styleClass="fieldname" />
-         <Button mnemonicParsing="false" onAction="#saveDataSqlite" styleClass="c-btn" text="保存到数据库" />
+         <Button mnemonicParsing="false" onMouseClicked="#saveDataSqlite" styleClass="c-btn" text="保存到数据库" />
       </HBox>
       <ScrollPane prefHeight="450.0">
         <content>
@@ -73,6 +75,6 @@
         </content>
       </ScrollPane>
       <Separator prefWidth="1000.0" />
-      <Label styleClass="status-info" fx:id="loginfo" prefHeight="15.0" prefWidth="1080" text="状态信息" />
+      <Label fx:id="loginfo" prefHeight="15.0" prefWidth="1080" styleClass="status-info" text="状态信息" />
    </children>
 </VBox>

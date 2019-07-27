@@ -5,11 +5,15 @@
 
 .h-box-row {
     -fx-alignment: top-left;
-    -fx-padding: 5px 10px;
+    -fx-padding: 3px 10px;
 }
 
 .c-label{
     -fx-pref-width: 135px;
+    -fx-padding: 5px 10px 5px 30px;
+}
+
+.t-label{
     -fx-padding: 5px 10px 5px 30px;
 }
 
@@ -19,7 +23,7 @@
     -fx-background-insets: 0 10px 0 0;
 }
 .fieldname {
-    -fx-pref-width: 765px;
+    -fx-pref-width: 513px;
     -fx-padding: 4px;
     -fx-background-insets: 0 10px 0 0;
 }
