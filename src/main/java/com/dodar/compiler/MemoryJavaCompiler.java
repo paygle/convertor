@@ -27,6 +27,20 @@ public class MemoryJavaCompiler {
     }
 
     /**
+     * 返回一个 Class 对象
+     * @param className
+     * @param source
+     * @return
+     * @throws ClassNotFoundException
+     */
+    public Class getClass(String className, String source) throws ClassNotFoundException {
+        final Map<String, byte[]> classBytes = compile(className + ".java", source);
+        final MemoryClassLoader classLoader = new MemoryClassLoader(classBytes);
+        final Class clazz = classLoader.loadClass(className);
+        return clazz;
+    }
+
+    /**
      * Compile a single static method.
      */
     public Method compileStaticMethod(final String methodName, final String className, final String source)
